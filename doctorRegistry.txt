@@ -1,0 +1,68 @@
+// ── База лікарів в пам'яті ────────────────────
+// При перезапуску скидається — TODO: замінити на файл/БД
+
+const doctors = {};  // { 'DOC-1234': { telegramId, name, city, registeredAt } }
+
+function generateCode() {
+  const num = Math.floor(1000 + Math.random() * 9000);
+  return `DOC-${num}`;
+}
+
+// Реєстрація або оновлення лікаря
+function registerDoctor(telegramId, name, city) {
+  const id = String(telegramId);
+
+  // Шукаємо існуючого
+  const existing = Object.entries(doctors).find(([, d]) => d.telegramId === id);
+  if (existing) {
+    // Оновлюємо дані якщо передані
+    if (name) existing[1].name = name;
+    if (city) existing[1].city = city;
+    return existing[0];
+  }
+
+  // Генеруємо унікальний код
+  let code;
+  do { code = generateCode(); } while (doctors[code]);
+
+  doctors[code] = {
+    telegramId: id,
+    name: name || 'Лікар',
+    city: city || '',
+    registeredAt: new Date().toISOString()
+  };
+
+  console.log(`✅ Doctor registered: ${code} → ${id} (${name}, ${city})`);
+  return code;
+}
+
+// Знайти лікаря по коду
+function getDoctorByCode(code) {
+  return doctors[code.toUpperCase()] || null;
+}
+
+// Пошук лікарів по імені/місту
+function searchDoctors(query) {
+  const q = query.toLowerCase().trim();
+  return Object.entries(doctors)
+    .filter(([, d]) => {
+      const fullName = d.name.toLowerCase();
+      const city = d.city.toLowerCase();
+      return fullName.includes(q) || city.includes(q);
+    })
+    .map(([code, d]) => ({
+      code,
+      name: d.name,
+      city: d.city
+    }))
+    .slice(0, 5); // максимум 5 результатів
+}
+
+// Отримати лікаря по telegramId
+function getDoctorByTelegramId(telegramId) {
+  const id = String(telegramId);
+  const found = Object.entries(doctors).find(([, d]) => d.telegramId === id);
+  return found ? { code: found[0], ...found[1] } : null;
+}
+
+module.exports = { registerDoctor, getDoctorByCode, searchDoctors, getDoctorByTelegramId };
