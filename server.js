@@ -196,22 +196,23 @@ app.post('/bot/webhook', async function(req, res) {
     const state = app.locals.regState;
 
     if (message.contact) {
-      const phone = message.contact.phone_number;
-      if (message.contact.user_id && message.contact.user_id !== telegramId) {
-        await sendMessage(telegramId, '⚠️ Будь ласка, поділіться *своїм* номером телефону, а не чужим.');
-        return res.sendStatus(200);
-      }
-      if (!state[telegramId] || state[telegramId].step !== 'awaiting_phone') return res.sendStatus(200);
-      const allowed = await isDoctorAllowedByPhone(phone);
-      if (!allowed) {
-        await sendMessage(telegramId, '❌ Номер *' + phone + '* не знайдено в базі дозволених лікарів.\n\nЗверніться до адміністратора Nexum для додавання вашого номера телефону.');
-        delete state[telegramId];
-        return res.sendStatus(200);
-      }
-      state[telegramId] = { step: 'name', phone };
-      await sendMessage(telegramId, '✅ Номер підтверджено!\n\nВведіть *повне ім\'я та прізвище*:');
-      return res.sendStatus(200);
-    }
+  const phone = message.contact.phone_number;
+  if (message.contact.user_id && message.contact.user_id !== telegramId) {
+    await sendMessage(telegramId, '⚠️ Будь ласка, поділіться *своїм* номером телефону, а не чужим.');
+    return res.sendStatus(200);
+  }
+  if (!state[telegramId] || state[telegramId].step !== 'awaiting_phone') return res.sendStatus(200);
+  
+  const allowed = await isDoctorAllowedByPhone(phone);
+  if (!allowed) {
+    await sendMessage(telegramId, '❌ Номер *' + phone + '* не знайдено в базі.\n\nЗверніться до адміністратора.');
+    delete state[telegramId];
+    return res.sendStatus(200);
+  }
+  state[telegramId] = { step: 'name', phone };
+  await sendMessage(telegramId, '✅ Номер підтверджено!\n\nВведіть *повне ім\'я та прізвище*:');
+  return res.sendStatus(200);
+}
 
     if (text === '/start') {
       const existing = await getDoctorByTelegramId(telegramId);
