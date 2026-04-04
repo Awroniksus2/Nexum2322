@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Кабінет модератора — Nexum</title>
+<meta name="robots" content="noindex, nofollow"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#05070e;--surface:#0b0f1c;--card:#0f1525;--border:#1a2540;--accent:#3b82f6;--accent2:#06d6a0;--warn:#f59e0b;--text:#dde4f0;--muted:#5a6e94;--white:#fff;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+/* ── Nav ── */
+.nav{height:56px;background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--white);}
+.logo span{color:var(--accent2);}
+.logo-link{text-decoration:none;}
+.nav-badge{background:#8b5cf620;border:1px solid #8b5cf640;color:#a78bfa;font-size:10px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:20px;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.nav-name{font-size:12px;color:var(--muted);}
+.btn-sm{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s;}
+.btn-sm:hover{border-color:#f87171;color:#f87171;}
+/* ── Layout ── */
+.body{flex:1;display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 56px);}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:20px;display:flex;flex-direction:column;gap:8px;}
+.main{padding:24px;overflow-y:auto;}
+/* ── Sidebar tabs ── */
+.s-tab{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:none;background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;transition:.15s;width:100%;text-align:left;}
+.s-tab:hover{background:var(--card);color:var(--text);}
+.s-tab.on{background:var(--card);color:var(--white);font-weight:500;}
+.s-tab-ic{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+.card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:4px;}
+.card-sub{font-size:12px;color:var(--muted);margin-bottom:18px;}
+/* ── Forms ── */
+.lbl{font-size:10.5px;font-weight:600;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;display:block;}
+.inp{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:.15s;margin-bottom:12px;}
+.inp:focus{border-color:var(--accent);}
+select.inp{cursor:pointer;}
+.inp::placeholder{color:var(--muted);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+/* ── Buttons ── */
+.btn-accent{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px 20px;font-size:13px;font-family:'Inter',sans-serif;font-weight:500;cursor:pointer;transition:.2s;}
+.btn-accent:hover{opacity:.85;}
+.btn-accent:disabled{opacity:.45;cursor:not-allowed;}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text);border-radius:9px;padding:10px 16px;font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;transition:.15s;}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn-green{background:#10b981;color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:12px;font-family:'Inter',sans-serif;font-weight:500;cursor:pointer;transition:.2s;}
+.btn-green:hover{opacity:.85;}
+.btn-danger{background:transparent;border:1px solid #ef444440;color:#f87171;border-radius:8px;padding:6px 12px;font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;transition:.15s;}
+.btn-danger:hover{background:#ef444415;}
+/* ── Link result box ── */
+.link-box{background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:14px 16px;margin-top:16px;}
+.link-url{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent2);word-break:break-all;margin-bottom:10px;}
+.link-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.copy-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;transition:.15s;}
+.copy-btn:hover{opacity:.85;}
+/* ── Links list ── */
+.link-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;}
+.link-item:hover{border-color:var(--accent);}
+.li-status{font-size:10px;padding:3px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-weight:500;flex-shrink:0;}
+.li-status.pending{background:#f59e0b20;color:#fbbf24;border:1px solid #f59e0b40;}
+.li-status.completed{background:#06d6a020;color:#34d399;border:1px solid #06d6a040;}
+.li-info{flex:1;min-width:0;}
+.li-title{font-size:13px;font-weight:600;color:var(--white);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.li-meta{font-size:11px;color:var(--muted);}
+.li-actions{display:flex;gap:6px;flex-shrink:0;}
+/* ── Stats ── */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:500;}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:4px;}
+/* ── Login screen ── */
+.login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px;width:100%;max-width:380px;}
+.login-ic{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px;}
+.login-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--white);text-align:center;margin-bottom:6px;}
+.login-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px;}
+.login-err{display:none;background:#160a0a;border:1px solid #5c1a1a;border-radius:9px;padding:10px 14px;font-size:12px;color:#f87171;text-align:center;margin-top:12px;}
+/* ── Toast ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 18px;font-size:13px;color:var(--text);z-index:9999;display:flex;align-items:center;gap:8px;transform:translateY(60px);opacity:0;transition:.3s cubic-bezier(.34,1.56,.64,1);}
+.toast.show{transform:none;opacity:1;}
+.toast.success{border-color:#34d39940;}
+.toast.error{border-color:#f8717140;}
+/* ── Empty state ── */
+.empty{text-align:center;padding:50px 20px;color:var(--muted);}
+.empty-ic{font-size:40px;margin-bottom:12px;}
+.empty h3{font-family:'Syne',sans-serif;font-size:16px;color:var(--white);margin-bottom:6px;}
+.empty p{font-size:13px;}
+/* ── Patient assign modal ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:#000b;z-index:999;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:460px;}
+.modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--white);margin-bottom:4px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.modal-btns{display:flex;gap:10px;margin-top:8px;}
+.modal-cancel{flex:1;background:transparent;border:1px solid var(--border);color:var(--text);border-radius:10px;padding:11px;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;}
+.modal-confirm{flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:11px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;}
+.modal-confirm:hover{opacity:.85;}
+@media(max-width:768px){
+  .body{grid-template-columns:1fr;}
+  .sidebar{display:flex;flex-direction:row;border-right:none;border-bottom:1px solid var(--border);padding:10px;gap:4px;overflow-x:auto;}
+  .s-tab{white-space:nowrap;flex-shrink:0;}
+  .row2{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <div class="login-ic">🛡️</div>
+    <div class="login-title">Кабінет модератора</div>
+    <div class="login-sub">Введіть код та пароль модератора</div>
+    <label class="lbl">Код модератора</label>
+    <input class="inp" id="modCode" placeholder="MOD-001" style="font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <label class="lbl">Пароль</label>
+    <input class="inp" id="modPass" type="password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="btn-accent" style="width:100%;margin-top:4px" id="loginBtn" onclick="doLogin()">Увійти →</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<div id="appScreen" style="display:none;flex-direction:column;min-height:100vh;">
+
+  <div class="nav">
+    <a href="nexum.html" class="logo-link"><div class="logo">Nexum<span>.</span></div></a>
+    <span class="nav-badge">Модератор</span>
+    <div class="nav-right">
+      <span class="nav-name" id="navName">...</span>
+      <button class="btn-sm" onclick="logout()">Вийти</button>
+    </div>
+  </div>
+
+  <div class="body">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <button class="s-tab on" onclick="showTab('create')" id="tab-create">
+        <div class="s-tab-ic" style="background:#3b82f620;color:#60a5fa">🔗</div>
+        Створити посилання
+      </button>
+      <button class="s-tab" onclick="showTab('links')" id="tab-links">
+        <div class="s-tab-ic" style="background:#06d6a020;color:#34d399">📋</div>
+        Мої посилання
+      </button>
+      <button class="s-tab" onclick="showTab('completed')" id="tab-completed">
+        <div class="s-tab-ic" style="background:#f59e0b20;color:#fbbf24">✅</div>
+        Заповнені анкети
+      </button>
+    </div>
+
+    <!-- Main content -->
+    <div class="main">
+
+      <!-- TAB: Створити посилання -->
+      <div id="pane-create">
+        <div class="stats-row" id="statsRow"></div>
+
+        <div class="card">
+          <div class="card-title">Конструктор посилання</div>
+          <div class="card-sub">Оберіть лікаря та шаблон опитування — отримаєте унікальне посилання для пацієнта</div>
+
+          <div class="row2">
+            <div>
+              <label class="lbl">Лікар *</label>
+              <select class="inp" id="selDoctor" onchange="loadDoctorSurveys()">
+                <option value="">— Оберіть лікаря —</option>
+              </select>
+            </div>
+            <div>
+              <label class="lbl">Шаблон опитування</label>
+              <select class="inp" id="selSurvey">
+                <option value="">— Спочатку оберіть лікаря —</option>
+              </select>
+            </div>
+          </div>
+
+          <label class="lbl">Ім'я пацієнта (необов'язково)</label>
+          <input class="inp" id="inpPatientName" placeholder="Іванова Марія Іванівна"/>
+
+          <label class="lbl">Нотатка для себе</label>
+          <input class="inp" id="inpNotes" placeholder="Наприклад: первинний прийом, кардіологія"/>
+
+          <button class="btn-accent" onclick="createLink()">🔗 Згенерувати посилання</button>
+
+          <!-- Результат -->
+          <div id="linkResult" style="display:none" class="link-box">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:8px;font-family:'JetBrains Mono',monospace">ПОСИЛАННЯ ДЛЯ ПАЦІЄНТА</div>
+            <div class="link-url" id="generatedLink"></div>
+            <div class="link-actions">
+              <button class="copy-btn" onclick="copyLink()">📋 Копіювати</button>
+              <button class="btn-ghost" style="font-size:12px;padding:7px 14px" onclick="openLink()">🔗 Відкрити</button>
+              <button class="btn-ghost" style="font-size:12px;padding:7px 14px" onclick="shareLink()">📤 Поділитись</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: Мої посилання -->
+      <div id="pane-links" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--white)">Мої посилання</div>
+          <button class="btn-ghost" style="font-size:12px" onclick="loadLinks()">↻ Оновити</button>
+        </div>
+        <div id="linksList"></div>
+      </div>
+
+      <!-- TAB: Заповнені анкети -->
+      <div id="pane-completed" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--white)">Заповнені анкети</div>
+          <button class="btn-ghost" style="font-size:12px" onclick="loadCompleted()">↻ Оновити</button>
+        </div>
+        <div id="completedList"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Призначити лікаря -->
+<div class="modal-overlay" id="assignModal">
+  <div class="modal-box">
+    <div class="modal-title">Призначити лікаря</div>
+    <div class="modal-sub" id="assignPatientName">Пацієнт заповнив анкету</div>
+    <label class="lbl">Оберіть лікаря</label>
+    <select class="inp" id="assignDoctor"></select>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">Скасувати</button>
+      <button class="modal-confirm" onclick="confirmAssign()">✓ Призначити лікаря</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──────────────────────────────────────────
+let modCode = '', modName = '';
+let allDoctors = [];
+let allLinks = [];
+let _currentToken = '';
+let _assignPatientId = '', _assignLinkToken = '';
+
+// ── Login ──────────────────────────────────────────
+async function doLogin() {
+  const code = (document.getElementById('modCode').value || '').trim().toUpperCase();
+  const pass = (document.getElementById('modPass').value || '').trim();
+  const err  = document.getElementById('loginErr');
+  err.style.display = 'none';
+  if (!code || !pass) { err.textContent = '❌ Введіть код та пароль'; err.style.display='block'; return; }
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Перевірка...';
+  try {
+    const r = await fetch('/api/moderator/login', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ code, password: pass }),
+    });
+    const data = await r.json();
+    if (r.ok && data.ok) {
+      sessionStorage.setItem('nexum_mod_code', data.code);
+      sessionStorage.setItem('nexum_mod_name', data.name || '');
+      modCode = data.code; modName = data.name || '';
+      showApp();
+    } else {
+      err.textContent = '❌ Невірний код або пароль';
+      err.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Увійти →';
+    }
+  } catch(e) {
+    err.textContent = '❌ Помилка з\'єднання';
+    err.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Увійти →';
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('nexum_mod_code');
+  sessionStorage.removeItem('nexum_mod_name');
+  location.reload();
+}
+
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  const app = document.getElementById('appScreen');
+  app.style.display = 'flex';
+  document.getElementById('navName').textContent = modName || modCode;
+  loadDoctors();
+  loadStats();
+}
+
+// ── Tab switching ──────────────────────────────────
+function showTab(tab) {
+  ['create','links','completed'].forEach(t => {
+    document.getElementById('pane-'+t).style.display = t===tab ? '' : 'none';
+    document.getElementById('tab-'+t).classList.toggle('on', t===tab);
+  });
+  if (tab==='links') loadLinks();
+  if (tab==='completed') loadCompleted();
+}
+
+// ── Stats ──────────────────────────────────────────
+async function loadStats() {
+  try {
+    const r = await fetch('/api/moderator/links?moderatorCode=' + encodeURIComponent(modCode));
+    const links = await r.json();
+    allLinks = Array.isArray(links) ? links : [];
+    const total     = allLinks.length;
+    const pending   = allLinks.filter(l => l.status==='pending').length;
+    const completed = allLinks.filter(l => l.status==='completed').length;
+    document.getElementById('statsRow').innerHTML = [
+      {val:total,    lbl:'Всього посилань', color:'#3b82f6'},
+      {val:pending,  lbl:'Очікують пацієнта', color:'#f59e0b'},
+      {val:completed,lbl:'Заповнено анкет', color:'#06d6a0'},
+    ].map(s => `<div class="stat-card"><div class="stat-val" style="color:${s.color}">${s.val}</div><div class="stat-lbl">${s.lbl}</div></div>`).join('');
+  } catch(e) { console.error(e); }
+}
+
+// ── Load doctors ───────────────────────────────────
+async function loadDoctors() {
+  try {
+    const r = await fetch('/api/moderator/doctors');
+    allDoctors = await r.json();
+    const sel = document.getElementById('selDoctor');
+    sel.innerHTML = '<option value="">— Оберіть лікаря —</option>';
+    allDoctors.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.code;
+      o.textContent = d.name + (d.specialty ? ` (${d.specialty})` : '');
+      sel.appendChild(o);
+    });
+    // Також для assign modal
+    const asel = document.getElementById('assignDoctor');
+    asel.innerHTML = '<option value="">— Оберіть лікаря —</option>';
+    allDoctors.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.code;
+      o.textContent = d.name + (d.specialty ? ` (${d.specialty})` : '');
+      asel.appendChild(o);
+    });
+  } catch(e) { console.error(e); }
+}
+
+// ── Load surveys for selected doctor ──────────────
+async function loadDoctorSurveys() {
+  const doctorCode = document.getElementById('selDoctor').value;
+  const sel = document.getElementById('selSurvey');
+  sel.innerHTML = '<option value="">— Завантаження... —</option>';
+  if (!doctorCode) { sel.innerHTML = '<option value="">— Спочатку оберіть лікаря —</option>'; return; }
+  try {
+    const r = await fetch('/api/moderator/surveys?doctorCode=' + encodeURIComponent(doctorCode));
+    const surveys = await r.json();
+    sel.innerHTML = '<option value="">— Без конкретного шаблону —</option>';
+    Object.entries(surveys || {}).forEach(([key, s]) => {
+      if (!s || !s.name) return;
+      const o = document.createElement('option');
+      o.value = key;
+      o.dataset.name = s.name;
+      o.textContent = s.name;
+      sel.appendChild(o);
+    });
+  } catch(e) {
+    sel.innerHTML = '<option value="">— Помилка завантаження —</option>';
+  }
+}
+
+// ── Create link ────────────────────────────────────
+async function createLink() {
+  const doctorCode  = document.getElementById('selDoctor').value;
+  const surveyEl    = document.getElementById('selSurvey');
+  const surveyKey   = surveyEl.value;
+  const surveyName  = surveyKey ? (surveyEl.selectedOptions[0]?.dataset?.name || surveyKey) : '';
+  const patientName = document.getElementById('inpPatientName').value.trim();
+  const notes       = document.getElementById('inpNotes').value.trim();
+
+  if (!doctorCode) { showToast('Оберіть лікаря', 'error'); return; }
+
+  try {
+    const r = await fetch('/api/moderator/link/create', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ moderatorCode: modCode, doctorCode, surveyKey, surveyName, patientName, notes }),
+    });
+    const data = await r.json();
+    if (!data.success) throw new Error(data.error || 'Помилка');
+
+    _currentToken = data.token;
+    const link = `${window.location.origin}/survey/${data.token}`;
+    document.getElementById('generatedLink').textContent = link;
+    document.getElementById('linkResult').style.display = '';
+    showToast('Посилання створено ✓');
+    loadStats();
+  } catch(e) { showToast('Помилка: ' + e.message, 'error'); }
+}
+
+function copyLink() {
+  const url = document.getElementById('generatedLink').textContent;
+  navigator.clipboard?.writeText(url).then(() => showToast('Скопійовано ✓'));
+}
+
+function openLink() {
+  const url = document.getElementById('generatedLink').textContent;
+  window.open(url, '_blank');
+}
+
+function shareLink() {
+  const url = document.getElementById('generatedLink').textContent;
+  if (navigator.share) {
+    navigator.share({ title: 'Nexum — медична анкета', url });
+  } else {
+    copyLink();
+  }
+}
+
+// ── Links list ─────────────────────────────────────
+async function loadLinks() {
+  const el = document.getElementById('linksList');
+  el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">Завантаження...</div>';
+  try {
+    const r = await fetch('/api/moderator/links?moderatorCode=' + encodeURIComponent(modCode));
+    const links = await r.json();
+    allLinks = Array.isArray(links) ? links : [];
+    if (!allLinks.length) {
+      el.innerHTML = `<div class="empty"><div class="empty-ic">🔗</div><h3>Немає посилань</h3><p>Перейдіть на вкладку «Створити посилання»</p></div>`;
+      return;
+    }
+    el.innerHTML = allLinks.map(l => {
+      const date = l.created_at ? new Date(l.created_at).toLocaleDateString('uk-UA') : '';
+      const doctor = allDoctors.find(d => d.code === l.doctor_code);
+      const docName = doctor ? doctor.name : l.doctor_code;
+      const url = `${window.location.origin}/survey/${l.token}`;
+      const isCompleted = l.status === 'completed';
+      return `<div class="link-item">
+        <span class="li-status ${l.status}">${isCompleted ? '✓ Заповнено' : '⏳ Очікує'}</span>
+        <div class="li-info">
+          <div class="li-title">${l.patient_name || 'Пацієнт не вказаний'} ${l.survey_name ? '· ' + l.survey_name : ''}</div>
+          <div class="li-meta">Лікар: ${docName} · ${date} ${l.notes ? '· ' + l.notes : ''}</div>
+        </div>
+        <div class="li-actions">
+          ${!isCompleted ? `<button class="btn-ghost" style="font-size:11px;padding:5px 10px" onclick="copyTokenLink('${l.token}')">📋 Копіювати</button>` : ''}
+          ${isCompleted ? `<button class="btn-green" onclick="openAssign('${l.token}', '${(l.patient_name||'').replace(/'/g,"\\'")}')">Призначити лікаря</button>` : ''}
+          <button class="btn-danger" onclick="deleteLink('${l.token}')">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = `<div class="empty"><p style="color:#f87171">Помилка завантаження: ${e.message}</p></div>`; }
+}
+
+function copyTokenLink(token) {
+  const url = `${window.location.origin}/survey/${token}`;
+  navigator.clipboard?.writeText(url).then(() => showToast('Скопійовано ✓'));
+}
+
+async function deleteLink(token) {
+  if (!confirm('Видалити це посилання?')) return;
+  try {
+    await fetch('/api/moderator/link/' + token, { method: 'DELETE' });
+    showToast('Видалено');
+    loadLinks(); loadStats();
+  } catch(e) { showToast('Помилка', 'error'); }
+}
+
+// ── Completed surveys ──────────────────────────────
+async function loadCompleted() {
+  const el = document.getElementById('completedList');
+  el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">Завантаження...</div>';
+  try {
+    const r = await fetch('/api/moderator/links?moderatorCode=' + encodeURIComponent(modCode));
+    const links = await r.json();
+    const completed = (Array.isArray(links) ? links : []).filter(l => l.status === 'completed');
+
+    if (!completed.length) {
+      el.innerHTML = `<div class="empty"><div class="empty-ic">📋</div><h3>Ще немає заповнених анкет</h3><p>Як тільки пацієнт заповнить форму — вона з'явиться тут</p></div>`;
+      return;
+    }
+
+    el.innerHTML = completed.map(l => {
+      const doctor = allDoctors.find(d => d.code === l.doctor_code);
+      const docName = doctor ? doctor.name : l.doctor_code;
+      const completedDate = l.completed_at ? new Date(l.completed_at).toLocaleString('uk-UA', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+      const patId = l.patient_id ? 'sb_' + l.patient_id : null;
+      return `<div class="link-item" style="border-color:#06d6a030">
+        <span class="li-status completed">✓ Заповнено</span>
+        <div class="li-info">
+          <div class="li-title">${l.patient_name || 'Пацієнт'} ${l.survey_name ? '· ' + l.survey_name : ''}</div>
+          <div class="li-meta">Лікар: ${docName} · Заповнено: ${completedDate}</div>
+        </div>
+        <div class="li-actions">
+          ${patId ? `<button class="btn-green" onclick="openAssign('${l.token}','${(l.patient_name||'').replace(/'/g,"\\'")}','${patId}')">Призначити лікаря</button>` : '<span style="font-size:11px;color:var(--muted)">Пацієнт не створений</span>'}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = `<div class="empty"><p style="color:#f87171">Помилка: ${e.message}</p></div>`; }
+}
+
+// ── Assign modal ───────────────────────────────────
+function openAssign(token, patientName, patientId) {
+  _assignLinkToken = token;
+  _assignPatientId = patientId || '';
+  document.getElementById('assignPatientName').textContent = patientName || 'Пацієнт заповнив анкету';
+  document.getElementById('assignModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('assignModal').classList.remove('show');
+  _assignLinkToken = '';
+  _assignPatientId = '';
+}
+
+async function confirmAssign() {
+  const doctorCode = document.getElementById('assignDoctor').value;
+  if (!doctorCode) { showToast('Оберіть лікаря', 'error'); return; }
+
+  // Якщо є patientId — оновлюємо doctor_code
+  if (_assignPatientId) {
+    try {
+      const r = await fetch('/api/moderator/assign', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          moderatorCode: modCode,
+          patientId:     _assignPatientId,
+          doctorCode,
+        }),
+      });
+      const data = await r.json();
+      if (!data.success) throw new Error(data.error || 'Помилка');
+      showToast('Пацієнта призначено лікарю ✓');
+    } catch(e) { showToast('Помилка: ' + e.message, 'error'); }
+  } else {
+    showToast('Пацієнт не знайдений в системі', 'error');
+  }
+  closeModal();
+  loadCompleted();
+}
+
+// ── Toast ──────────────────────────────────────────
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type;
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Init ───────────────────────────────────────────
+(function init() {
+  const code = sessionStorage.getItem('nexum_mod_code');
+  const name = sessionStorage.getItem('nexum_mod_name') || '';
+  if (code) {
+    modCode = code; modName = name;
+    showApp();
+  }
+})();
+
+// Закрити modal кліком по оверлею
+document.getElementById('assignModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>

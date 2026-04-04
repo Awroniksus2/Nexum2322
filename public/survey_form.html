@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Медична анкета — Nexum</title>
+<meta name="description" content="Заповніть медичну анкету перед прийомом лікаря"/>
+<meta name="robots" content="noindex, nofollow"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#05070e;--surface:#0b0f1c;--card:#0f1525;--border:#1a2540;--accent:#3b82f6;--accent2:#06d6a0;--text:#dde4f0;--muted:#5a6e94;--white:#fff;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+/* ── Header ── */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 20px;text-align:center;}
+.logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--white);margin-bottom:4px;}
+.logo span{color:var(--accent2);}
+.header-sub{font-size:12px;color:var(--muted);}
+/* ── Progress ── */
+.progress-bar{height:3px;background:var(--border);}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease;border-radius:0 2px 2px 0;}
+/* ── Content ── */
+.content{max-width:560px;margin:0 auto;padding:24px 16px 40px;width:100%;flex:1;}
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:16px;}
+.card-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--white);margin-bottom:4px;}
+.card-sub{font-size:12.5px;color:var(--muted);margin-bottom:18px;line-height:1.6;}
+/* ── Forms ── */
+.lbl{font-size:10.5px;font-weight:600;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;display:block;}
+.req{color:#f87171;}
+.inp{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:.15s;margin-bottom:14px;}
+.inp:focus{border-color:var(--accent);}
+.inp::placeholder{color:var(--muted);}
+select.inp{cursor:pointer;}
+textarea.inp{resize:vertical;min-height:80px;line-height:1.5;}
+/* ── Scale ── */
+.scale-wrap{margin-bottom:14px;}
+.scale-btns{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.scale-btn{width:40px;height:40px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.scale-btn:hover{border-color:var(--accent);color:var(--accent);}
+.scale-btn.sel{background:var(--accent);border-color:var(--accent);color:#fff;}
+.scale-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:6px;font-family:'JetBrains Mono',monospace;}
+/* ── Yes/No ── */
+.yn-wrap{display:flex;gap:8px;margin-bottom:14px;}
+.yn-btn{flex:1;padding:11px;border-radius:10px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;transition:all .15s;}
+.yn-btn:hover{border-color:var(--accent);color:var(--text);}
+.yn-btn.sel-yes{background:#10b98120;border-color:#10b981;color:#34d399;}
+.yn-btn.sel-no {background:#ef444420;border-color:#ef4444;color:#f87171;}
+/* ── Choices ── */
+.choice-wrap{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.choice-btn{padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;text-align:left;}
+.choice-btn:hover{border-color:var(--accent);color:var(--text);}
+.choice-btn.sel{background:#3b82f620;border-color:var(--accent);color:var(--white);}
+/* ── Question card ── */
+.q-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;transition:border-color .2s;}
+.q-card.answered{border-color:#3b82f640;}
+.q-num{font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:6px;}
+.q-text{font-size:14px;color:var(--white);margin-bottom:12px;line-height:1.5;}
+.q-required{color:#f87171;font-size:11px;margin-left:4px;}
+/* ── Submit button ── */
+.submit-btn{width:100%;background:var(--accent2);color:var(--bg);border:none;border-radius:12px;padding:15px;font-size:15px;font-family:'Inter',sans-serif;font-weight:700;cursor:pointer;transition:all .2s;margin-top:6px;}
+.submit-btn:hover{opacity:.9;transform:translateY(-1px);}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+/* ── States ── */
+.state-screen{text-align:center;padding:60px 20px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.state-ic{font-size:56px;margin-bottom:20px;}
+.state-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--white);margin-bottom:10px;}
+.state-desc{font-size:14px;color:var(--muted);line-height:1.7;max-width:340px;}
+/* ── Doc badge ── */
+.doc-badge{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.doc-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.doc-name{font-size:13px;font-weight:600;color:var(--white);}
+.doc-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+/* ── Error ── */
+.field-error{font-size:11px;color:#f87171;margin-top:-10px;margin-bottom:10px;}
+@media(max-width:480px){
+  .content{padding:16px 12px 32px;}
+  .card{padding:16px;}
+  .scale-btn{width:34px;height:34px;font-size:12px;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Nexum<span>.</span></div>
+  <div class="header-sub" id="headerSub">Медична анкета</div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+<div class="content" id="mainContent">
+  <div class="state-screen">
+    <div style="font-size:32px;margin-bottom:12px">⏳</div>
+    <div style="font-size:14px;color:var(--muted)">Завантаження анкети...</div>
+  </div>
+</div>
+
+<script>
+const token = (location.pathname.split('/').pop() || '').replace(/[^a-zA-Z0-9\-]/g, '');
+let surveyData = null;
+let answers = {};
+
+// ── Init ───────────────────────────────────────────
+async function init() {
+  if (!token) { showError('Невірне посилання'); return; }
+  try {
+    const r = await fetch('/api/survey/' + token);
+    const data = await r.json();
+
+    if (data.status === 'completed') { showState('completed'); return; }
+    if (data.status === 'expired')   { showState('expired');   return; }
+    if (!r.ok || data.error)         { showError(data.error || 'Помилка'); return; }
+
+    surveyData = data;
+    renderForm();
+  } catch(e) {
+    showError('Помилка з\'єднання з сервером. Перевірте інтернет і спробуйте ще раз.');
+  }
+}
+
+// ── Render form ────────────────────────────────────
+function renderForm() {
+  const d = surveyData;
+  document.getElementById('headerSub').textContent = d.surveyName || 'Медична анкета';
+  document.title = (d.surveyName || 'Анкета') + ' — Nexum';
+  setProgress(5);
+
+  const questions = Array.isArray(d.questions) ? d.questions : [];
+
+  let html = '';
+
+  // Doctor badge
+  if (d.doctorName) {
+    html += `<div class="doc-badge"><div class="doc-av">🩺</div><div><div class="doc-name">${esc(d.doctorName)}</div><div class="doc-sub">Ваш лікар</div></div></div>`;
+  }
+
+  // Intro card
+  html += `<div class="card"><div class="card-title">${esc(d.surveyName || 'Медична анкета')}</div>
+    <div class="card-sub">Будь ласка, заповніть анкету перед прийомом лікаря. Ваші відповіді допоможуть лікарю краще підготуватись.<br/><br/>Час заповнення: ~3–5 хвилин.</div></div>`;
+
+  // Personal info
+  html += `<div class="card"><div class="card-title">Ваші дані</div>
+    <label class="lbl">Ім'я <span class="req">*</span></label>
+    <input class="inp" id="fFirstName" placeholder="Ваше ім'я" value="${esc(d.patientName ? d.patientName.split(' ')[1] || '' : '')}"/>
+    <label class="lbl">Прізвище <span class="req">*</span></label>
+    <input class="inp" id="fLastName" placeholder="Ваше прізвище" value="${esc(d.patientName ? d.patientName.split(' ')[0] || '' : '')}"/>
+    <label class="lbl">Телефон</label>
+    <input class="inp" id="fPhone" type="tel" placeholder="+38 067 000 00 00"/>
+    <label class="lbl">Telegram (username)</label>
+    <input class="inp" id="fTelegram" placeholder="@username"/>
+  </div>`;
+
+  // Survey questions
+  if (questions.length) {
+    html += `<div class="card"><div class="card-title">Питання від лікаря</div><div class="card-sub">Відповідайте максимально точно — це допоможе лікарю</div>`;
+    html += questions.map((q, i) => renderQuestion(q, i)).join('');
+    html += `</div>`;
+  }
+
+  // Submit
+  html += `<button class="submit-btn" id="submitBtn" onclick="submitForm()">✓ Відправити анкету</button>
+    <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:12px">Натискаючи кнопку, ви погоджуєтесь з обробкою медичних даних</p>`;
+
+  document.getElementById('mainContent').innerHTML = html;
+  setProgress(15);
+}
+
+function renderQuestion(q, idx) {
+  const req = q.required ? '<span class="q-required">*</span>' : '';
+  const qid = `q_${q.id || idx}`;
+
+  let control = '';
+
+  if (q.type === 'yesno') {
+    control = `<div class="yn-wrap">
+      <button class="yn-btn" id="${qid}_yes" onclick="setYN('${qid}','Так')">✓ Так</button>
+      <button class="yn-btn" id="${qid}_no"  onclick="setYN('${qid}','Ні')">✗ Ні</button>
+    </div>`;
+
+  } else if (q.type === 'scale') {
+    const min = q.min || 1;
+    const max = q.max || 10;
+    const btns = [];
+    for (let i = min; i <= max; i++) {
+      btns.push(`<button class="scale-btn" id="${qid}_${i}" onclick="setScale('${qid}',${i})">${i}</button>`);
+    }
+    control = `<div class="scale-wrap"><div class="scale-btns">${btns.join('')}</div>
+      <div class="scale-labels"><span>${min} — мінімум</span><span>максимум — ${max}</span></div>
+    </div>`;
+
+  } else if (q.type === 'choice' && Array.isArray(q.options)) {
+    control = `<div class="choice-wrap">${q.options.map((opt, oi) =>
+      `<button class="choice-btn" id="${qid}_${oi}" onclick="setChoice('${qid}',${oi},'${esc(opt)}')">${esc(opt)}</button>`
+    ).join('')}</div>`;
+
+  } else if (q.type === 'multi' && Array.isArray(q.options)) {
+    control = `<div class="choice-wrap" id="${qid}_multi">${q.options.map((opt, oi) =>
+      `<button class="choice-btn" id="${qid}_m_${oi}" onclick="toggleMulti('${qid}',${oi},'${esc(opt)}')">${esc(opt)}</button>`
+    ).join('')}</div>`;
+
+  } else if (q.type === 'date') {
+    control = `<input class="inp" type="date" id="${qid}_inp" onchange="setVal('${qid}',this.value)"/>`;
+
+  } else {
+    // text / default
+    const isLong = (q.text || '').length > 50;
+    if (isLong) {
+      control = `<textarea class="inp" id="${qid}_inp" rows="3" placeholder="Ваша відповідь..." oninput="setVal('${qid}',this.value)"></textarea>`;
+    } else {
+      control = `<input class="inp" id="${qid}_inp" placeholder="Ваша відповідь..." oninput="setVal('${qid}',this.value)"/>`;
+    }
+  }
+
+  return `<div class="q-card" id="${qid}_card">
+    <div class="q-num">${idx + 1}/${(surveyData.questions||[]).length}</div>
+    <div class="q-text">${esc(q.text || '')}${req}</div>
+    ${control}
+  </div>`;
+}
+
+// ── Answer handlers ────────────────────────────────
+function setYN(qid, val) {
+  answers[qid] = val;
+  document.getElementById(qid+'_yes').className = 'yn-btn' + (val==='Так' ? ' sel-yes' : '');
+  document.getElementById(qid+'_no' ).className = 'yn-btn' + (val==='Ні'  ? ' sel-no'  : '');
+  markAnswered(qid);
+}
+
+function setScale(qid, val) {
+  answers[qid] = val;
+  const q = surveyData.questions.find(q => `q_${q.id}` === qid || `q_${surveyData.questions.indexOf(q)}` === qid);
+  const min = q?.min || 1;
+  const max = q?.max || 10;
+  for (let i = min; i <= max; i++) {
+    const b = document.getElementById(`${qid}_${i}`);
+    if (b) b.className = 'scale-btn' + (i <= val ? ' sel' : '');
+  }
+  markAnswered(qid);
+}
+
+function setChoice(qid, oi, val) {
+  answers[qid] = val;
+  const q = surveyData.questions.find((q, idx) => `q_${q.id || idx}` === qid);
+  if (q && Array.isArray(q.options)) {
+    q.options.forEach((_, i) => {
+      const b = document.getElementById(`${qid}_${i}`);
+      if (b) b.className = 'choice-btn' + (i === oi ? ' sel' : '');
+    });
+  }
+  markAnswered(qid);
+}
+
+function toggleMulti(qid, oi, val) {
+  if (!answers[qid]) answers[qid] = [];
+  const arr = Array.isArray(answers[qid]) ? answers[qid] : [];
+  const idx = arr.indexOf(val);
+  if (idx === -1) arr.push(val); else arr.splice(idx, 1);
+  answers[qid] = arr;
+  const b = document.getElementById(`${qid}_m_${oi}`);
+  if (b) b.className = 'choice-btn' + (arr.includes(val) ? ' sel' : '');
+  if (arr.length) markAnswered(qid); else {
+    const card = document.getElementById(qid+'_card');
+    if (card) card.classList.remove('answered');
+  }
+}
+
+function setVal(qid, val) {
+  answers[qid] = val;
+  if (val.trim()) markAnswered(qid);
+  else {
+    const card = document.getElementById(qid+'_card');
+    if (card) card.classList.remove('answered');
+  }
+}
+
+function markAnswered(qid) {
+  const card = document.getElementById(qid+'_card');
+  if (card) card.classList.add('answered');
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = (surveyData?.questions || []).length;
+  if (!total) return;
+  const done = Object.keys(answers).filter(k => {
+    const v = answers[k];
+    return v !== undefined && v !== '' && !(Array.isArray(v) && !v.length);
+  }).length;
+  const pct = 15 + Math.round((done / total) * 75);
+  setProgress(Math.min(pct, 90));
+}
+
+function setProgress(pct) {
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+// ── Submit ─────────────────────────────────────────
+async function submitForm() {
+  const firstName = (document.getElementById('fFirstName')?.value || '').trim();
+  const lastName  = (document.getElementById('fLastName')?.value  || '').trim();
+  const phone     = (document.getElementById('fPhone')?.value    || '').trim();
+  const telegram  = (document.getElementById('fTelegram')?.value || '').trim();
+
+  if (!firstName && !lastName) {
+    document.getElementById('fFirstName').focus();
+    document.getElementById('fFirstName').style.borderColor = '#f87171';
+    showInlineError('fFirstName', "Будь ласка, вкажіть ваше ім'я");
+    return;
+  }
+
+  // Перевіряємо обов'язкові поля
+  const questions = surveyData?.questions || [];
+  for (const q of questions) {
+    if (!q.required) continue;
+    const qid = `q_${q.id}`;
+    const val  = answers[qid];
+    const isEmpty = val === undefined || val === '' || (Array.isArray(val) && !val.length);
+    if (isEmpty) {
+      document.getElementById(qid+'_card')?.scrollIntoView({ behavior:'smooth', block:'center' });
+      document.getElementById(qid+'_card').style.borderColor = '#f87171';
+      setTimeout(() => { if (document.getElementById(qid+'_card')) document.getElementById(qid+'_card').style.borderColor = ''; }, 3000);
+      showToastInline("Будь ласка, дайте відповідь на всі обов'язкові питання");
+      return;
+    }
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Відправка...';
+  setProgress(95);
+
+  // Формуємо масив відповідей
+  const answersArr = questions.map((q, idx) => ({
+    id:    q.id || String(idx),
+    text:  q.text || '',
+    type:  q.type || 'text',
+    value: answers[`q_${q.id || idx}`] ?? '',
+  }));
+
+  try {
+    const r = await fetch(`/api/survey/${token}/submit`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ firstName, lastName, phone, telegram, answers: answersArr }),
+    });
+    const data = await r.json();
+    if (!r.ok || !data.success) throw new Error(data.error || 'Помилка сервера');
+    setProgress(100);
+    setTimeout(() => showState('success'), 400);
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '✓ Відправити анкету';
+    showToastInline('Помилка: ' + e.message);
+  }
+}
+
+// ── State screens ──────────────────────────────────
+function showState(type) {
+  const states = {
+    success: {
+      ic: '🎉',
+      title: 'Анкету успішно відправлено!',
+      desc: 'Дякуємо! Лікар вже бачить ваші відповіді і буде готовий до прийому. До зустрічі!'
+    },
+    completed: {
+      ic: '✅',
+      title: 'Анкету вже заповнено',
+      desc: 'Ви вже надіслали цю анкету раніше. Якщо виникло питання — зверніться до клініки.'
+    },
+    expired: {
+      ic: '⏰',
+      title: 'Посилання застаріло',
+      desc: 'Термін дії цього посилання вийшов. Будь ласка, зверніться до клініки для отримання нового посилання.'
+    },
+    error: {
+      ic: '❌',
+      title: 'Помилка',
+      desc: 'Посилання не знайдено або недійсне. Зверніться до клініки.'
+    },
+  };
+  const s = states[type] || states.error;
+  document.getElementById('progressFill').style.width = type === 'success' ? '100%' : '0%';
+  document.getElementById('mainContent').innerHTML = `
+    <div class="state-screen">
+      <div class="state-ic">${s.ic}</div>
+      <div class="state-title">${s.title}</div>
+      <p class="state-desc">${s.desc}</p>
+    </div>`;
+}
+
+function showError(msg) {
+  document.getElementById('mainContent').innerHTML = `
+    <div class="state-screen">
+      <div class="state-ic">❌</div>
+      <div class="state-title">Помилка</div>
+      <p class="state-desc">${esc(msg || 'Щось пішло не так.')}</p>
+    </div>`;
+}
+
+function showInlineError(inputId, msg) {
+  const el = document.getElementById(inputId);
+  if (!el) return;
+  el.style.borderColor = '#f87171';
+  let err = el.nextElementSibling;
+  if (!err || !err.classList.contains('field-error')) {
+    err = document.createElement('div');
+    err.className = 'field-error';
+    el.parentNode.insertBefore(err, el.nextSibling);
+  }
+  err.textContent = msg;
+  setTimeout(() => { el.style.borderColor = ''; if (err.parentNode) err.parentNode.removeChild(err); }, 4000);
+}
+
+function showToastInline(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#ef444420;border:1px solid #ef444460;color:#f87171;border-radius:10px;padding:12px 20px;font-size:13px;z-index:9999;text-align:center;max-width:320px;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(() => { t.style.opacity = '0'; }, 3500);
+}
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ── Start ──────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
